@@ -26,7 +26,7 @@ target_include_directories(rcspp_core
 # --- Python binding ---
 
 # Dependencies
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 find_package(nanobind REQUIRED)
 
 # Link with core library
