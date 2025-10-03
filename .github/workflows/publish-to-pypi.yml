@@ -1,0 +1,68 @@
+# .github/workflows/publish-to-pypi.yml
+
+name: Build and publish Python distributions to PyPI
+
+# 1. Trigger: Run this workflow when a new tag starting with 'v' is pushed
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # 2. Build Matrix: Run for each OS
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up QEMU for building wheels for other architectures (e.g. arm64)
+      # This is especially useful for Linux builds
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+
+      # Use the gold-standard tool for building binary wheels.
+      # It handles all the complexity of different architectures and standards.
+      - name: Build wheels with cibuildwheel
+        uses: pypa/cibuildwheel@v2.16.5
+        env:
+          # Tell cibuildwheel to build for all supported architectures.
+          # For macOS, this will build both x86_64 and arm64 (Apple Silicon).
+          CIBW_ARCHS_MACOS: "auto"
+          # Add any build-time environment variables if needed
+          # e.g. CIBW_ENVIRONMENT: 'VAR="value"'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-wheels
+          path: ./wheelhouse/*.whl
+
+  publish_wheels:
+    name: Publish wheels to PyPI
+    # 5. Publish Job: Run only after all build jobs are successful
+    needs: [build_wheels]
+    runs-on: ubuntu-latest
+
+    # Grant permissions to upload to PyPI
+    permissions:
+      id-token: write # this is required for trusted publishing
+
+    steps:
+      - name: Download all wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-wheels
+          path: dist/
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # Use the API token stored in GitHub Secrets
+          password: ${{ secrets.PYPI_API_TOKEN }}
