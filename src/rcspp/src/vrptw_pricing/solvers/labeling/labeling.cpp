@@ -215,9 +215,9 @@ void init_ng_neighbors(const Context& context, Workspace& workspace){
         );
 
         Workspace::Neighbors& ng_neighbors = workspace.ng_neighbors_per_vertex[u.id];
-        size_t ng_size = std::max(0LL, std::min(workspace.solve_params.ng_neighbor_size, graph.out_degree(u)));
+        int64_t ng_size = std::max<int64_t>(0, std::min<int64_t>(workspace.solve_params.ng_neighbor_size, graph.out_degree(u)));
         ng_neighbors.reserve(ng_size);
-        for(size_t i = 0; i < neighbors.size() && i < ng_size; ++i){
+        for(int64_t i = 0; i < neighbors.size() && i < ng_size; ++i){
             ng_neighbors.push_back(neighbors[i].vertex_id);
         }
         std::sort(ng_neighbors.begin(), ng_neighbors.end());
