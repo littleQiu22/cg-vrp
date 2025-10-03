@@ -30,5 +30,11 @@ Homepage = "https://github.com/littleQiu22/cg-vrp"
 [tool.scikit-build]
 wheel.packages = ["src/cgvrp"]
 
+[tool.scikit-build.cmake]
+minimum-version = "3.18"
+
+[tool.scikit-build.opts]
+cmake.args = ["-DCMAKE_CXX_STANDARD=17"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
