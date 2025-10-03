@@ -31,8 +31,10 @@ jobs:
         uses: pypa/cibuildwheel@v2.16.5
         env:
           CIBW_ARCHS_MACOS: "universal2"
-          CIBW_MACOSX_DEPLOYMENT_TARGET: "10.13"
-          CIBW_ENVIRONMENT_MACOS: "CXXFLAGS='-mmacosx-version-min=10.13' LDFLAGS='-mmacosx-version-min=10.13'"
+          CIBW_MACOSX_DEPLOYMENT_TARGET: "10.15"
+          CIBW_ENVIRONMENT_MACOS: >
+            CXXFLAGS='-mmacosx-version-min=10.15 -std=c++17'
+            LDFLAGS='-mmacosx-version-min=10.15'
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
